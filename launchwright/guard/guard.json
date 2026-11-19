@@ -1,0 +1,40 @@
+{
+  "//": "This project's settings for the Launchwright guard (launchwright/guard/guard-lib.mjs reads them). They only ever add to what the guard refuses; the built-in rules hold whatever this file says. Agents may add the user's answers here with a file edit (a key's name, where real users' data lives, text the user approved), but never take anything away; the guard refuses that.",
+  "//workingBranch": "The one branch agents push to. Set it to null if a push to it builds or deploys: then only the user pushes.",
+  "workingBranch": "main",
+  "//productionBranches": "Branches that deploy to production, on top of release and production.",
+  "productionBranches": [],
+  "//keyNames": "The names of this project's keys in the environment, such as STRIPE_SECRET_KEY. Never printed or expanded.",
+  "keyNames": [],
+  "//keyFolders": "Folders besides the project folder and app/ that hold .env files.",
+  "keyFolders": [],
+  "//userDataPaths": "Files and folders holding real users' data, such as exports. Never read, copied, changed or committed.",
+  "userDataPaths": [],
+  "//userDataHosts": "Hosts holding real users' data, such as the production database's. Never reached from the command line.",
+  "userDataHosts": [],
+  "//productionScripts": "package.json scripts that deploy, release, update or submit, beyond the ones whose names start with deploy, release, submit, publish, ship, upload or launch.",
+  "productionScripts": [],
+  "//protectedPaths": "More files and folders only a kit update or the user changes.",
+  "protectedPaths": [],
+  "//approvedText": "Text the user approved, such as store answers or the privacy policy: never changed without asking again. A new version goes in a new file.",
+  "approvedText": [],
+  "//refusedPrograms": "More programs agents never run, each with the reason they see.",
+  "refusedPrograms": {},
+  "//refusedHosts": "More hosts agents never reach from the command line, each with the reason they see.",
+  "refusedHosts": {},
+  "//easWorkflows": "Expo workflow files agents may start with eas workflow:run, such as a test run. Only the user adds to this list.",
+  "easWorkflows": [],
+  "//tests": "This project's own cases for the guard's test: commands it must refuse, and everyday commands it must allow.",
+  "tests": {
+    "refused": [
+      "eas submit --platform ios",
+      "git push --force origin main",
+      "git push origin main:release"
+    ],
+    "allowed": [
+      "git push origin main",
+      "node launchwright/scripts/status.mjs show",
+      "npx expo start"
+    ]
+  }
+}

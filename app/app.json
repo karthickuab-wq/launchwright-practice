@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "Starter App",
+    "slug": "starter-app",
+    "scheme": "starterapp",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.example.starterapp"
+    },
+    "android": {
+      "package": "com.example.starterapp"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

@@ -1,0 +1,174 @@
+<!--
+  Example style choices: Usewell, the walkthrough's sample app (a recipe app from a podcast idea).
+  Its main screen, Today, in three styles, each with the same real content in its own look and its
+  own tone of voice. Calm and airy is first because it's the recommended one. This is the dry run of
+  the design-direction skill: build it with the mockup skill's page,
+    node skills/mockup/make-page.mjs skills/design-direction/examples/usewell/styles.html <page to write>
+  and check its colours with
+    node skills/design-direction/check-contrast.mjs skills/design-direction/examples/usewell/styles.html
+-->
+<meta name="mockup-app" content="Usewell">
+<meta name="mockup-title" content="Usewell: pick a style">
+<meta name="mockup-kind" content="styles">
+<meta name="mockup-flow" content="today">
+<style>
+/* Calm and airy (recommended): sage, mint and cream; lots of space; "use today" red only for today. */
+.app.theme-calm {
+  --bg: #FBFAF6; --surface: #F1F3EC; --ink: #1F2A22; --muted: #66706A; --line: #E3E6DE;
+  --accent: #3F7A5A; --accent-ink: #FFFFFF; --accent-soft: #E5F1E8;
+  --warn: #B2452C; --warn-soft: #F8E6E0; --amber: #8A5A00; --amber-soft: #FBF1DA; --good: #2F6B45; --good-soft: #E5F1E8;
+  --radius: 18px; --title: 30px;
+}
+/* Bold and playful: tomato, sunshine and deep plum; big type; chunky outlined cards. */
+.app.theme-bold {
+  --bg: #FFF6E9; --surface: #FFFFFF; --ink: #24123F; --muted: #5B4B73; --line: #24123F;
+  --accent: #C9321A; --accent-ink: #FFFFFF; --accent-soft: #FFE1D6;
+  --warn: #B3200F; --warn-soft: #FFE1DA; --amber: #7F4A00; --amber-soft: #FFEDB8; --good: #17663A; --good-soft: #D3F4DD;
+  --sun: #FFD43B;
+  --radius: 20px; --title: 40px;
+}
+/* Clean and serious: white, cool greys and one blue; tight spacing; facts first. */
+.app.theme-clean {
+  --bg: #FFFFFF; --surface: #F5F7FA; --ink: #111827; --muted: #4B5563; --line: #E5E7EB;
+  --accent: #1E4FD8; --accent-ink: #FFFFFF; --accent-soft: #EEF2FF;
+  --warn: #B42318; --warn-soft: #FEF3F2; --amber: #93370D; --amber-soft: #FFFAEB; --good: #067647; --good-soft: #ECFDF3;
+  --radius: 10px; --title: 26px;
+}
+
+/* Calm and airy */
+.uw-hero { height: 104px; margin: 0; border-radius: 0; font-size: 36px; position: relative; background: radial-gradient(circle at 30% 30%, #F4E9C9 0, #E9D9AE 45%, #D9C38D 100%); }
+.uw-hero em { font-style: normal; filter: drop-shadow(0 4px 6px rgba(0,0,0,.12)); }
+.uw-rec { width: 100%; border: 0; padding: 0; text-align: left; background: var(--surface); border-radius: var(--radius); overflow: hidden; font: inherit; color: var(--ink); }
+.uw-rec .uw-uses { position: absolute; left: 12px; bottom: 10px; font-size: 13px; font-weight: 650; background: rgba(255,255,255,.92); color: var(--good); border-radius: 999px; padding: 4px 10px; }
+.uw-rec .tx { padding: 12px 14px 14px; }
+.uw-rec b { display: block; font-size: 18px; }
+.uw-rec small { color: var(--muted); font-size: 14px; }
+
+/* Bold and playful */
+.theme-bold .a-title { font-weight: 900; letter-spacing: -.035em; line-height: 1; margin: 6px 0 8px; }
+.theme-bold .a-sub { color: var(--ink); font-size: 17px; }
+.theme-bold .a-h2 { font-size: 22px; font-weight: 900; letter-spacing: -.02em; margin: 22px 0 12px; }
+.uw-b-eye { display: inline-block; margin: 0; font-size: 14px; font-weight: 800; background: var(--sun); color: var(--ink); border-radius: 999px; padding: 4px 12px; transform: rotate(-2deg); }
+.uw-b-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.uw-b-tile { position: relative; min-height: 116px; border: 2px solid var(--ink); border-radius: var(--radius); background: var(--tile, #fff); box-shadow: 4px 4px 0 var(--ink); padding: 12px; text-align: left; font: inherit; color: var(--ink); display: flex; flex-direction: column; justify-content: flex-end; }
+.uw-b-tile .e { position: absolute; top: 10px; left: 10px; font-size: 34px; line-height: 1; }
+.uw-b-tile b { font-size: 18px; font-weight: 850; line-height: 1.15; }
+.uw-b-tile small { font-size: 14px; font-weight: 600; color: var(--muted); }
+.uw-b-st { position: absolute; top: 10px; right: 8px; font-size: 13px; font-weight: 850; border-radius: 999px; padding: 4px 9px; background: var(--good-soft); color: var(--good); border: 2px solid var(--ink); transform: rotate(4deg); }
+.uw-b-st.today { background: var(--warn); color: #fff; }
+.uw-b-st.soon { background: var(--sun); color: var(--ink); }
+.uw-b-rec { width: 100%; border: 2px solid var(--ink); border-radius: var(--radius); background: var(--sun); box-shadow: 4px 4px 0 var(--ink); padding: 16px; text-align: left; font: inherit; color: var(--ink); }
+.uw-b-rec .em { font-size: 34px; letter-spacing: 4px; line-height: 1; }
+.uw-b-rec b { display: block; font-size: 23px; font-weight: 900; letter-spacing: -.02em; line-height: 1.1; margin: 10px 0 4px; }
+.uw-b-rec small { display: block; font-size: 15px; font-weight: 650; }
+.uw-b-rec .go { display: flex; align-items: center; justify-content: center; min-height: 52px; margin-top: 14px; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-weight: 850; font-size: 17px; border: 2px solid var(--ink); }
+.theme-bold .a-tabs { border-top: 2px solid var(--ink); }
+.theme-bold .a-tabs button { font-weight: 800; color: var(--ink); }
+.theme-bold .a-tabs button[aria-current="page"] .i { background: var(--sun); border-radius: 999px; padding: 2px 14px; }
+
+/* Clean and serious */
+.theme-clean .a-title { font-weight: 700; letter-spacing: -.015em; }
+.theme-clean .a-eyebrow { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+.theme-clean .a-h2 { font-size: 13px; font-weight: 650; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 22px 0 8px; }
+.uw-k-sum { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid var(--line); border-radius: var(--radius); margin: 4px 0 16px; }
+.uw-k-sum div { padding: 10px 12px; } .uw-k-sum div + div { border-left: 1px solid var(--line); }
+.uw-k-sum b { display: block; font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.uw-k-sum small { display: block; font-size: 13px; color: var(--muted); }
+.uw-k-sum .hot b { color: var(--warn); }
+.uw-k-list { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.uw-k-row { width: 100%; display: flex; align-items: center; gap: 12px; min-height: 58px; padding: 8px 14px; border: 0; background: var(--bg); font: inherit; color: var(--ink); text-align: left; }
+.uw-k-row + .uw-k-row { border-top: 1px solid var(--line); }
+.uw-k-row .dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--good); }
+.uw-k-row .dot.today { background: var(--warn); } .uw-k-row .dot.soon { background: #D97706; }
+.uw-k-row .m { flex: 1; min-width: 0; } .uw-k-row .m b { display: block; font-weight: 600; } .uw-k-row .m small { display: block; font-size: 14px; color: var(--muted); }
+.uw-k-row .d { flex: none; text-align: right; font-size: 14px; font-variant-numeric: tabular-nums; }
+.uw-k-row .d b { display: block; font-weight: 600; } .uw-k-row .d small { display: block; color: var(--muted); font-size: 13px; }
+.uw-k-row .d.today b { color: var(--warn); }
+.uw-k-rec { border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
+.uw-k-rec b { display: block; font-size: 17px; font-weight: 650; }
+.uw-k-rec small { display: block; font-size: 14px; color: var(--muted); margin-top: 2px; }
+.uw-k-rec .a-btn { margin-top: 12px; min-height: 48px; font-size: 16px; font-weight: 600; }
+.theme-clean .a-tabs button { font-weight: 500; }
+.theme-clean .a-tabs button[aria-current="page"] { color: var(--accent); }
+</style>
+
+<template data-screen="today" data-name="Today" data-group="Style choices" data-about="Usewell's main screen in three styles" data-variant="Calm and airy" data-theme="calm">
+  <div class="a-pad">
+    <p class="a-eyebrow">Tuesday evening</p>
+    <h1 class="a-title">Use these first</h1>
+    <p class="a-sub">4 things go off in the next few days.</p>
+    <button class="a-row" data-note="Opens the spinach, to change its date or mark it used."><span class="a-ic" style="background:#E5F1E8">🥬</span><span class="m"><b>Spinach</b><small>1 bag</small></span><span class="a-tag today">Tomorrow</span></button>
+    <button class="a-row" data-note="Opens the chicken, to change its date or mark it used."><span class="a-ic" style="background:#FBF1DA">🍗</span><span class="m"><b>Chicken thighs</b><small>4 pieces</small></span><span class="a-tag soon">2 days</span></button>
+    <button class="a-row" data-note="Opens the yogurt, to change its date or mark it used."><span class="a-ic" style="background:#EEF1F6">🥛</span><span class="m"><b>Greek yogurt</b><small>Half a pot</small></span><span class="a-tag soon">2 days</span></button>
+    <button class="a-row" data-note="Opens the lemon, to change its date or mark it used."><span class="a-ic" style="background:#FBF6D8">🍋</span><span class="m"><b>Lemon</b><small>Half</small></span><span class="a-tag">4 days</span></button>
+    <h2 class="a-h2">Tonight, in 15 minutes</h2>
+    <button class="uw-rec" data-note="Opens tonight's recipe, which uses three of your things.">
+      <div class="a-hero uw-hero"><em>🍗</em><em>🥬</em><em>🍋</em><span class="uw-uses">Uses 3 of yours</span></div>
+      <div class="tx"><b>Lemony chicken &amp; spinach</b><small>15 min · serves 2</small></div>
+    </button>
+  </div>
+  <nav class="a-tabs">
+    <button aria-current="page" data-go="today" data-note="What to use first, and tonight's idea. You're here."><span class="i" data-icon="sun"></span>Today</button>
+    <button data-note="Your kitchen: everything you have, by when to use it."><span class="i" data-icon="list"></span>Kitchen</button>
+    <button data-note="Opens the scanner: scan a receipt, or type what you bought."><span class="i" data-icon="plus"></span>Add</button>
+    <button data-note="Opens your reminders and the Plus plan."><span class="i" data-icon="settings"></span>Settings</button>
+  </nav>
+</template>
+
+<template data-screen="today" data-variant="Bold and playful" data-theme="bold">
+  <div class="a-pad">
+    <p class="uw-b-eye">Tuesday night</p>
+    <h1 class="a-title">Eat me first!</h1>
+    <p class="a-sub">4 things are about to go off. Rescue them!</p>
+    <div class="uw-b-grid">
+      <button class="uw-b-tile" style="--tile:#D3F4DD" data-note="Opens the spinach, to change its date or mark it used."><span class="e">🥬</span><span class="uw-b-st today">Tomorrow!</span><b>Spinach</b><small>1 bag</small></button>
+      <button class="uw-b-tile" style="--tile:#FFEDB8" data-note="Opens the chicken, to change its date or mark it used."><span class="e">🍗</span><span class="uw-b-st soon">2 days</span><b>Chicken thighs</b><small>4 pieces</small></button>
+      <button class="uw-b-tile" style="--tile:#E3E8FF" data-note="Opens the yogurt, to change its date or mark it used."><span class="e">🥛</span><span class="uw-b-st soon">2 days</span><b>Greek yogurt</b><small>Half a pot</small></button>
+      <button class="uw-b-tile" style="--tile:#FFF3A8" data-note="Opens the lemon, to change its date or mark it used."><span class="e">🍋</span><span class="uw-b-st">4 days</span><b>Lemon</b><small>Half</small></button>
+    </div>
+    <h2 class="a-h2">Tonight's rescue mission</h2>
+    <button class="uw-b-rec" data-note="Opens tonight's recipe, which uses three of your things.">
+      <span class="em">🍗🥬🍋</span>
+      <b>Lemony chicken &amp; spinach</b>
+      <small>15 min · serves 2 · saves 3 things</small>
+      <span class="go">Let's cook it</span>
+    </button>
+  </div>
+  <nav class="a-tabs">
+    <button aria-current="page" data-go="today" data-note="What to use first, and tonight's idea. You're here."><span class="i" data-icon="sun"></span>Today</button>
+    <button data-note="Your kitchen: everything you have, by when to use it."><span class="i" data-icon="list"></span>Kitchen</button>
+    <button data-note="Opens the scanner: scan a receipt, or type what you bought."><span class="i" data-icon="plus"></span>Add</button>
+    <button data-note="Opens your reminders and the Plus plan."><span class="i" data-icon="settings"></span>Settings</button>
+  </nav>
+</template>
+
+<template data-screen="today" data-variant="Clean and serious" data-theme="clean">
+  <div class="a-pad">
+    <p class="a-eyebrow">Tue 18 Nov</p>
+    <h1 class="a-title">Expiring soon</h1>
+    <p class="a-sub">Sorted by use-by date.</p>
+    <div class="uw-k-sum">
+      <div class="hot"><b>1</b><small>Tomorrow</small></div>
+      <div><b>4</b><small>This week</small></div>
+      <div><b>23</b><small>In stock</small></div>
+    </div>
+    <div class="uw-k-list">
+      <button class="uw-k-row" data-note="Opens the spinach, to change its date or mark it used."><span class="dot today"></span><span class="m"><b>Spinach</b><small>1 bag · Fridge</small></span><span class="d today"><b>Wed 19 Nov</b><small>1 day</small></span></button>
+      <button class="uw-k-row" data-note="Opens the chicken, to change its date or mark it used."><span class="dot soon"></span><span class="m"><b>Chicken thighs</b><small>4 pieces · Fridge</small></span><span class="d"><b>Thu 20 Nov</b><small>2 days</small></span></button>
+      <button class="uw-k-row" data-note="Opens the yogurt, to change its date or mark it used."><span class="dot soon"></span><span class="m"><b>Greek yogurt</b><small>Half a pot · Fridge</small></span><span class="d"><b>Thu 20 Nov</b><small>2 days</small></span></button>
+      <button class="uw-k-row" data-note="Opens the lemon, to change its date or mark it used."><span class="dot"></span><span class="m"><b>Lemon</b><small>Half · Fridge</small></span><span class="d"><b>Sat 22 Nov</b><small>4 days</small></span></button>
+    </div>
+    <h2 class="a-h2">Suggested recipe</h2>
+    <div class="uw-k-rec">
+      <b>Lemony chicken &amp; spinach</b>
+      <small>15 min · 2 servings · uses 3 expiring items</small>
+      <button class="a-btn" data-note="Opens tonight's recipe, which uses three of your things.">View recipe</button>
+    </div>
+  </div>
+  <nav class="a-tabs">
+    <button aria-current="page" data-go="today" data-note="What to use first, and tonight's idea. You're here."><span class="i" data-icon="sun"></span>Today</button>
+    <button data-note="Your kitchen: everything you have, by when to use it."><span class="i" data-icon="list"></span>Kitchen</button>
+    <button data-note="Opens the scanner: scan a receipt, or type what you bought."><span class="i" data-icon="plus"></span>Add</button>
+    <button data-note="Opens your reminders and the Plus plan."><span class="i" data-icon="settings"></span>Settings</button>
+  </nav>
+</template>

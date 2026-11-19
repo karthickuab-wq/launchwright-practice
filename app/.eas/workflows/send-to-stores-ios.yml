@@ -1,0 +1,33 @@
+# Sends the app to Apple, only after the user taps Approve on this run's page on expo.dev (spec screen 17,
+# open point O5). The kit copies this file to .eas/workflows/ in the project; that folder is protected from
+# agents, so only a kit update or setup writes it.
+# A push whose message says [store-ios] starts it: Claude can push that, and it builds the store version.
+# Nothing goes to Apple until someone signed in to the user's Expo account approves the waiting job; the
+# project's Claude has no Expo sign-in, so that tap is always the user's. Reject, or 30 days with no
+# answer, and nothing is sent. Apple then puts the build in TestFlight; sending it for App Review is the
+# user's own step in App Store Connect.
+# Before the first run: one store build from the user's computer, the App Store Connect key on Expo, and
+# the app's Apple ID in eas.json (the launch-prep skill walks through each).
+name: send-to-stores-ios
+on:
+  push:
+    branches: ['main']
+    if: ${{ contains(github.commit_message, '[store-ios]') }}
+jobs:
+  build_ios:
+    name: Build the App Store version
+    type: build
+    params:
+      platform: ios
+      profile: production
+  approve:
+    name: Send this version to Apple?
+    needs: [build_ios]
+    type: require-approval
+  send_ios:
+    name: Upload to App Store Connect (TestFlight)
+    needs: [build_ios, approve]
+    type: submit
+    params:
+      build_id: ${{ needs.build_ios.outputs.build_id }}
+      profile: production

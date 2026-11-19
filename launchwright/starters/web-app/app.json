@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "Starter Web App",
+    "slug": "starter-web-app",
+    "scheme": "starterwebapp",
+    "version": "1.0.0",
+    "userInterfaceStyle": "light",
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "platforms": [
+      "web"
+    ]
+  }
+}

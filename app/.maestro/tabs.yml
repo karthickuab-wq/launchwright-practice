@@ -1,0 +1,8 @@
+appId: com.example.starterapp
+---
+- launchApp
+- assertVisible: 'Open More'
+- tapOn: 'Open More'
+- assertVisible: 'Try a tap'
+- tapOn: 'Home'
+- assertVisible: 'Starter screen'

@@ -1,0 +1,24 @@
+# Phone-flow tests on a simulated iPhone, run on Expo's servers (checkpoints, spec screen 15).
+# The kit copies this file to .eas/workflows/ in the project; that folder is protected from agents, so only a kit
+# update or setup writes it. It runs only for a push whose message says both [checkpoint] and
+# [phone-flows]. Maestro jobs aren't in Expo's Free plan: on a paid plan each costs money (open point O9;
+# the checkpoint skill's sources.md), so the checkpoint skill adds [phone-flows] only after the user says yes, each time.
+# It builds the e2e-test profile from eas.json and runs every flow in .maestro/. It never submits to a
+# store and never deploys.
+name: phone-flows-ios
+on:
+  push:
+    branches: ['main']
+    if: ${{ contains(github.commit_message, '[checkpoint]') && contains(github.commit_message, '[phone-flows]') }}
+jobs:
+  build_for_flows:
+    type: build
+    params:
+      platform: ios
+      profile: e2e-test
+  run_flows:
+    needs: [build_for_flows]
+    type: maestro
+    params:
+      build_id: ${{ needs.build_for_flows.outputs.build_id }}
+      flow_path: ['.maestro/home.yml', '.maestro/tabs.yml', '.maestro/tap.yml']

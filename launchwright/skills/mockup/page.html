@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mockup</title>
+<!--
+  The mockup page (Launchwright, skills/mockup). One self-contained page, phone-sized, that shows
+  an app's screens: clickable, with a note on each button, a comment box on every screen, a list
+  of screens, and side-by-side versions of a screen (before and after, or style choices).
+  Don't edit this file for one app. Write the app's screens file and build the page with
+  make-page.mjs, which puts the screens where the marker below is. SKILL.md says how.
+  No network: no fonts, images or scripts load from anywhere.
+-->
+<style>
+/* ---------- The page's own frame (not the app) ---------- */
+:root {
+  --ch-bg: #F3F2EE; --ch-ink: #1C1C1E; --ch-muted: #6B6B70; --ch-line: #E2E0DA;
+  --ch-card: #FFFFFF; --ch-accent: #1C1C1E; --ch-hi: #2F6BFF;
+  /* The frame around the app (top bar, versions, bottom buttons) is dark, so it never looks like part of the app */
+  --ch-frame: #1C1C1E; --ch-frame-ink: #F5F5F7; --ch-frame-muted: #AEAEB2; --ch-frame-line: #3A3A3C;
+  --safe-t: env(safe-area-inset-top, 0px); --safe-b: env(safe-area-inset-bottom, 0px);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-text-size-adjust: 100%; text-size-adjust: 100%;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--ch-bg); color: var(--ch-ink); overflow: hidden; }
+button { font: inherit; color: inherit; }
+.shell { display: flex; flex-direction: column; height: 100vh; height: 100dvh; max-width: 430px; margin: 0 auto; background: var(--ch-bg); position: relative; overflow: hidden; overflow: clip; }
+@media (min-width: 640px) and (min-height: 700px) {
+  body { display: flex; align-items: center; justify-content: center; }
+  .shell { width: 390px; height: min(844px, calc(100dvh - 32px)); border-radius: 30px; box-shadow: 0 0 0 1px var(--ch-line), 0 24px 60px rgba(0,0,0,.14); margin: 0; }
+}
+.bar { padding: calc(8px + var(--safe-t)) 14px 8px; display: flex; align-items: center; gap: 10px; background: var(--ch-frame); color: var(--ch-frame-ink); border-bottom: 1px solid var(--ch-frame-line); min-height: 58px; }
+.bar .t { flex: 1; min-width: 0; }
+.bar .t small { display: block; font-size: 12px; color: var(--ch-frame-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar .t b { display: block; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar .pos { font-size: 12px; font-weight: 600; color: var(--ch-frame-muted); background: transparent; border: 1px solid var(--ch-frame-line); border-radius: 999px; padding: 5px 10px; white-space: nowrap; }
+.bar .pos:empty { display: none; }
+.variants { display: flex; gap: 4px; padding: 6px 14px 8px; background: var(--ch-frame); border-bottom: 1px solid var(--ch-frame-line); }
+.variants[hidden] { display: none; }
+.variants button { flex: 1 1 0; min-width: 0; min-height: 44px; border: 1px solid var(--ch-frame-line); background: transparent; border-radius: 12px; font-size: 14px; line-height: 1.2; font-weight: 600; color: var(--ch-frame-muted); padding: 4px 6px; text-wrap: balance; }
+.variants button[aria-pressed="true"] { background: var(--ch-frame-ink); color: var(--ch-ink); border-color: var(--ch-frame-ink); }
+.stage { flex: 1; min-height: 0; position: relative; overflow: hidden; overflow: clip; }
+.app { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+.dock { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 6px; padding: 8px 10px calc(8px + var(--safe-b)); background: var(--ch-frame); border-top: 1px solid var(--ch-frame-line); }
+.dock button[hidden] { display: none; }
+.dock button { min-height: 48px; border: 0; border-radius: 12px; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 12px; font-weight: 600; color: var(--ch-frame-ink); }
+.dock button svg { width: 20px; height: 20px; }
+.dock button[aria-pressed="true"] { background: rgba(255,255,255,.16); }
+.dock .count { font-size: 11px; color: var(--ch-frame-muted); font-weight: 500; }
+.dock .primary { background: var(--ch-frame-ink); color: var(--ch-ink); }
+/* Sheets */
+.scrim { position: absolute; inset: 0; background: rgba(0,0,0,.32); opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 20; }
+.scrim.on { opacity: 1; pointer-events: auto; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; max-height: 86%; background: var(--ch-card); border-radius: 20px 20px 0 0; z-index: 21; transform: translateY(105%); transition: transform .24s ease; display: flex; flex-direction: column; box-shadow: 0 -10px 30px rgba(0,0,0,.12); }
+.sheet:not(.on) { visibility: hidden; transition: transform .24s ease, visibility 0s .24s; }
+.sheet.on { transform: none; }
+.sheet .head { display: flex; align-items: center; gap: 8px; padding: 14px 16px 8px; }
+.sheet .head h2 { flex: 1; margin: 0; font-size: 18px; }
+.sheet .close { min-width: 44px; min-height: 44px; border: 0; background: var(--ch-bg); border-radius: 999px; font-size: 20px; line-height: 1; }
+.sheet .body { overflow-y: auto; padding: 0 16px calc(18px + var(--safe-b)); }
+.sheet p.hint { margin: 0 0 10px; color: var(--ch-muted); font-size: 14px; line-height: 1.4; }
+.list-group { margin: 10px 0 4px; font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ch-muted); }
+.list-item { width: 100%; display: flex; align-items: center; gap: 12px; text-align: left; border: 1px solid var(--ch-line); background: var(--ch-card); border-radius: 14px; padding: 10px 12px; min-height: 56px; margin: 0 0 7px; }
+.list-item .n { flex: none; width: 30px; height: 30px; border-radius: 9px; background: var(--ch-bg); display: grid; place-items: center; font-weight: 700; font-size: 14px; }
+.list-item b { display: block; font-size: 15px; }
+.list-item small { display: block; color: var(--ch-muted); font-size: 13px; margin-top: 1px; }
+.list-item[aria-current="true"] { border-color: var(--ch-ink); }
+.list-item[aria-current="true"] .n { background: var(--ch-ink); color: #fff; }
+textarea.cbox { width: 100%; min-height: 120px; resize: vertical; border: 1px solid var(--ch-line); border-radius: 14px; padding: 12px; font: inherit; font-size: 16px; line-height: 1.4; background: #FCFCFB; color: var(--ch-ink); }
+textarea.cbox:focus { outline: 2px solid var(--ch-hi); outline-offset: 1px; }
+.btn { display: block; width: 100%; min-height: 48px; border: 0; border-radius: 14px; background: var(--ch-accent); color: #fff; font-weight: 700; font-size: 16px; margin-top: 10px; }
+.btn.quiet { background: var(--ch-bg); color: var(--ch-ink); }
+.btn[disabled] { opacity: .45; }
+.msg { min-height: 20px; margin: 8px 0 0; font-size: 14px; color: var(--ch-muted); line-height: 1.4; }
+.msg.ok { color: #1F7A45; } .msg.bad { color: #B3261E; }
+.mine { border-top: 1px solid var(--ch-line); margin-top: 16px; padding-top: 12px; font-size: 14px; color: var(--ch-muted); }
+textarea.copyout { width: 100%; min-height: 110px; margin-top: 8px; font: inherit; font-size: 13px; border: 1px solid var(--ch-line); border-radius: 12px; padding: 10px; }
+/* Notes */
+.notes { position: absolute; left: 0; right: 0; bottom: 0; max-height: 46%; z-index: 15; background: var(--ch-card); border-radius: 18px 18px 0 0; box-shadow: 0 -8px 26px rgba(0,0,0,.14); transform: translateY(105%); transition: transform .22s ease; display: flex; flex-direction: column; }
+.notes:not(.on) { visibility: hidden; transition: transform .22s ease, visibility 0s .22s; }
+.notes.on { transform: none; }
+.notes .head { display: flex; align-items: center; padding: 10px 14px 6px; gap: 8px; border-bottom: 1px solid var(--ch-line); }
+.notes .head b { flex: 1; font-size: 15px; }
+.notes .head button { min-height: 44px; min-width: 44px; border: 0; background: var(--ch-bg); border-radius: 999px; font-weight: 600; padding: 0 14px; }
+.notes ol { list-style: none; margin: 0; padding: 0 14px 14px; overflow-y: auto; }
+.notes li button { width: 100%; text-align: left; display: flex; gap: 10px; align-items: flex-start; border: 0; background: none; padding: 9px 0; min-height: 44px; border-bottom: 1px solid var(--ch-line); }
+.notes li:last-child button { border-bottom: 0; }
+.notes .pin-n { flex: none; }
+.notes li b { display: block; font-size: 14px; }
+.notes li span.w { display: block; font-size: 14px; color: var(--ch-muted); margin-top: 2px; line-height: 1.35; }
+.notes .none { padding: 6px 14px 16px; color: var(--ch-muted); font-size: 14px; }
+.pin-n { width: 22px; height: 22px; border-radius: 999px; background: var(--ch-hi); color: #fff; font-size: 12px; font-weight: 700; display: inline-grid; place-items: center; box-shadow: 0 0 0 2px #fff; }
+body.notes-on .app [data-pin] { outline: 2px dashed var(--ch-hi); outline-offset: 2px; }
+body.notes-on .app [data-pin]::after { content: attr(data-pin); position: absolute; top: -9px; right: -9px; z-index: 5; width: 22px; height: 22px; border-radius: 999px; background: var(--ch-hi); color: #fff; font: 700 12px/22px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; text-align: center; box-shadow: 0 0 0 2px #fff; letter-spacing: 0; text-transform: none; }
+body.notes-on .app .flash { outline: 3px solid var(--ch-hi); }
+.toast { position: absolute; left: 50%; bottom: 84px; transform: translateX(-50%) translateY(20px); background: var(--ch-ink); color: #fff; font-size: 14px; padding: 10px 14px; border-radius: 12px; opacity: 0; pointer-events: none; transition: .2s; z-index: 30; width: max-content; max-width: 90%; text-align: center; }
+.toast.on { opacity: 1; transform: translateX(-50%); }
+.empty { padding: 40px 24px; text-align: center; color: var(--ch-muted); }
+@media (prefers-reduced-motion: reduce) { .sheet, .notes, .scrim, .toast { transition: none; } }
+
+/* ---------- The app's building blocks: themed by the variables on .app ----------
+   A screens file sets the variables (its own theme) and can add its own styles. */
+.app {
+  --bg: #FFFFFF; --surface: #F6F6F4; --ink: #1C1C1E; --muted: #6B6B70; --line: #E6E6E1;
+  --accent: #1C1C1E; --accent-ink: #FFFFFF; --accent-soft: #EFEFEC; --warn: #B3261E; --warn-soft: #FBEAE7;
+  --amber: #8A5A00; --amber-soft: #FBF1DA; --good: #2F6B45; --good-soft: #E5F1E8;
+  --radius: 16px; --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --title: 28px;
+  background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 16px; line-height: 1.4;
+}
+.screen { min-height: 100%; display: flex; flex-direction: column; }
+.screen > .a-pad { flex: 1; }
+.a-pad { padding: 18px 20px 24px; }
+.a-eyebrow { margin: 0; font-size: 14px; color: var(--muted); }
+.a-title { margin: 2px 0 4px; font-size: var(--title); line-height: 1.15; letter-spacing: -.02em; font-weight: 750; }
+.a-sub { margin: 0 0 14px; color: var(--muted); }
+.a-h2 { margin: 22px 0 10px; font-size: 18px; font-weight: 700; }
+.a-center { text-align: center; }
+.a-card { background: var(--surface); border-radius: var(--radius); padding: 14px; }
+.a-row { width: 100%; display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin: 0 0 8px; border-radius: var(--radius); background: var(--surface); border: 0; text-align: left; min-height: 60px; color: var(--ink); font: inherit; }
+.a-ic { flex: none; width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; font-size: 22px; background: var(--accent-soft); }
+.a-row .m { flex: 1; min-width: 0; }
+.a-row .m b { display: block; font-weight: 650; }
+.a-row .m small { display: block; color: var(--muted); font-size: 14px; }
+.a-tag { flex: none; font-size: 13px; font-weight: 650; padding: 4px 9px; border-radius: 999px; background: var(--good-soft); color: var(--good); }
+.a-tag.today { background: var(--warn-soft); color: var(--warn); }
+.a-tag.soon { background: var(--amber-soft); color: var(--amber); }
+.a-btn { display: block; width: 100%; min-height: 52px; margin-top: 14px; border: 0; border-radius: var(--radius); background: var(--accent); color: var(--accent-ink); font: inherit; font-weight: 700; font-size: 17px; }
+.a-btn.ghost { background: var(--accent-soft); color: var(--ink); }
+.a-btn.dark { background: #111; color: #fff; }
+.a-link { border: 0; background: none; color: var(--accent); font: inherit; font-weight: 650; min-height: 44px; padding: 0 4px; }
+.a-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.a-chips span { padding: 7px 12px; border-radius: 999px; background: var(--good-soft); color: var(--good); font-size: 14px; font-weight: 600; }
+.a-chips span.need { background: var(--surface); color: var(--muted); }
+.a-steps { margin: 0; padding-left: 22px; }
+.a-steps li { margin: 0 0 10px; padding-left: 4px; }
+.a-hero { border-radius: calc(var(--radius) + 6px); display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 48px; background: var(--accent-soft); }
+.a-field { display: block; margin: 0 0 12px; }
+.a-field span { display: block; font-size: 14px; color: var(--muted); margin-bottom: 5px; }
+.a-input { width: 100%; min-height: 48px; border: 1px solid var(--line); border-radius: 12px; padding: 12px; font: inherit; background: var(--bg); color: var(--ink); }
+.a-setrow { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.a-setrow small { display: block; color: var(--muted); font-size: 14px; }
+.a-toggle { flex: none; width: 51px; height: 31px; border-radius: 999px; background: var(--good); position: relative; border: 0; }
+.a-toggle::before { content: ""; position: absolute; top: 2px; right: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); }
+.a-toggle.off { background: var(--line); }
+.a-toggle.off::before { right: auto; left: 2px; }
+.a-notif { display: flex; gap: 12px; align-items: flex-start; background: var(--surface); border-radius: var(--radius); padding: 12px; margin: 14px 0; }
+.a-notif .ap { flex: none; width: 36px; height: 36px; border-radius: 9px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-size: 18px; font-weight: 700; }
+/* An empty app icon shows a bell, so a notification never shows a blank square */
+.a-notif .ap:empty::before { content: ""; width: 20px; height: 20px; background: currentColor; -webkit-mask: var(--ic-bell) center / contain no-repeat; mask: var(--ic-bell) center / contain no-repeat; }
+.a-notif b { font-size: 14px; } .a-notif p { margin: 2px 0 0; font-size: 14px; color: var(--muted); }
+.a-tabs { position: sticky; bottom: 0; display: flex; background: var(--bg); border-top: 1px solid var(--line); padding: 6px 4px 8px; z-index: 2; }
+.a-tabs button { flex: 1; border: 0; background: none; min-height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font: inherit; font-size: 11px; font-weight: 600; color: var(--muted); }
+.a-tabs button .i { font-size: 20px; line-height: 1; }
+/* Line icons that take the theme's colours: <span class="i" data-icon="home"></span>. Use these in a
+   tab bar rather than emoji, which keep their own colours whatever the style. */
+.i[data-icon] { display: inline-grid; place-items: center; min-width: 24px; min-height: 24px; }
+.i[data-icon]::before { content: ""; width: 24px; height: 24px; background: currentColor; -webkit-mask: var(--ic) center / contain no-repeat; mask: var(--ic) center / contain no-repeat; }
+.a-foot { position: sticky; bottom: 0; z-index: 2; margin-top: auto; padding: 10px 20px 14px; background: var(--bg); border-top: 1px solid var(--line); }
+.a-foot .a-btn { margin-top: 0; }
+.a-tabs button[aria-current="page"] { color: var(--accent); }
+/* The icon set: home, list, plus, settings, sun, calendar, search, person, heart, chat, bell, star, cart, box */
+.app { --ic-home: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 11l8-7 8 7'/><path d='M6 9.5V20h4.5v-5.5h3V20H18V9.5'/></svg>"); }
+.i[data-icon="home"] { --ic: var(--ic-home); }
+.app { --ic-list: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 6h11M9 12h11M9 18h11'/><path d='M4.5 6h.01M4.5 12h.01M4.5 18h.01' stroke-width='3'/></svg>"); }
+.i[data-icon="list"] { --ic: var(--ic-list); }
+.app { --ic-plus: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 5v14M5 12h14'/></svg>"); }
+.i[data-icon="plus"] { --ic: var(--ic-plus); }
+.app { --ic-settings: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 7h9M17 7h3M4 17h3M11 17h9'/><circle cx='15' cy='7' r='2'/><circle cx='9' cy='17' r='2'/></svg>"); }
+.i[data-icon="settings"] { --ic: var(--ic-settings); }
+.app { --ic-sun: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='12' r='4'/><path d='M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4'/></svg>"); }
+.i[data-icon="sun"] { --ic: var(--ic-sun); }
+.app { --ic-calendar: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='4' y='5' width='16' height='15' rx='2'/><path d='M4 10h16M8 3v4M16 3v4'/></svg>"); }
+.i[data-icon="calendar"] { --ic: var(--ic-calendar); }
+.app { --ic-search: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='6'/><path d='M20 20l-4.5-4.5'/></svg>"); }
+.i[data-icon="search"] { --ic: var(--ic-search); }
+.app { --ic-person: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><circle cx='12' cy='8' r='4'/><path d='M4.5 20c1.4-3.6 4.2-5.5 7.5-5.5s6.1 1.9 7.5 5.5'/></svg>"); }
+.i[data-icon="person"] { --ic: var(--ic-person); }
+.app { --ic-heart: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.3a4.2 4.2 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20z'/></svg>"); }
+.i[data-icon="heart"] { --ic: var(--ic-heart); }
+.app { --ic-chat: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-8l-4 3.5V16H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z'/></svg>"); }
+.i[data-icon="chat"] { --ic: var(--ic-chat); }
+.app { --ic-bell: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z'/><path d='M10 20.5h4'/></svg>"); }
+.i[data-icon="bell"] { --ic: var(--ic-bell); }
+.app { --ic-star: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 4l2.4 5 5.4.6-4 3.7 1.1 5.3L12 16l-4.9 2.6 1.1-5.3-4-3.7 5.4-.6z'/></svg>"); }
+.i[data-icon="star"] { --ic: var(--ic-star); }
+.app { --ic-cart: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 4h2l2.2 10.5h10.6L20 8H6.2'/><circle cx='9' cy='19' r='1.5'/><circle cx='17' cy='19' r='1.5'/></svg>"); }
+.i[data-icon="cart"] { --ic: var(--ic-cart); }
+.app { --ic-box: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 8l8-4 8 4v8l-8 4-8-4z'/><path d='M4 8l8 4 8-4M12 12v8'/></svg>"); }
+.i[data-icon="box"] { --ic: var(--ic-box); }
+</style>
+<!--MOCKUP:SCREENS-->
+</head>
+<body>
+<div class="shell" id="shell">
+  <header class="bar">
+    <div class="t"><small id="appname">Mockup</small><b id="scrname">…</b></div>
+    <span class="pos" id="pos"></span>
+  </header>
+  <div class="variants" id="variants" role="group" aria-label="Versions of this screen" hidden></div>
+  <main class="stage" id="stage">
+    <div class="app" id="app" tabindex="-1"></div>
+    <section class="notes" id="notes" aria-label="What each button does" aria-hidden="true">
+      <div class="head"><b>What each button does</b><button type="button" id="notesHide">Hide</button></div>
+      <ol id="notelist"></ol>
+    </section>
+  </main>
+  <nav class="dock" aria-label="Mockup">
+    <button type="button" id="bScreens"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/></svg>Screens</button>
+    <button type="button" id="bNotes" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 7.6v.4"/></svg><span>Notes <span class="count" id="ncount"></span></span></button>
+    <button type="button" id="bComment" class="primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-8l-4 3.5V16H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg>Comment</button>
+    <button type="button" id="bNext"><svg id="nextic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg><span id="nextlabel">Next</span></button>
+  </nav>
+  <div class="scrim" id="scrim"></div>
+  <section class="sheet" id="sheetScreens" role="dialog" aria-modal="true" aria-labelledby="hScreens" aria-hidden="true">
+    <div class="head"><h2 id="hScreens">Every screen</h2><button type="button" class="close" data-close aria-label="Close">×</button></div>
+    <div class="body"><p class="hint">Tap one to open it. Each has notes and a comment box.</p><div id="screenlist"></div></div>
+  </section>
+  <section class="sheet" id="sheetComment" role="dialog" aria-modal="true" aria-labelledby="hComment" aria-hidden="true">
+    <div class="head"><h2 id="hComment">Comment</h2><button type="button" class="close" data-close aria-label="Close">×</button></div>
+    <div class="body">
+      <p class="hint" id="chint">Say what you'd change, or what you like. You can talk instead of typing: use your keyboard's microphone.</p>
+      <label for="cbox" class="hint" style="position:absolute;left:-9999px">Your comment</label>
+      <textarea class="cbox" id="cbox" maxlength="3000" placeholder="For example: make this button bigger"></textarea>
+      <button type="button" class="btn" id="cSend">Save comment</button>
+      <p class="msg" id="cmsg" role="status"></p>
+      <div class="mine" id="mine">
+        <span id="minecount">No comments on this phone yet.</span>
+        <button type="button" class="btn quiet" id="cCopy" hidden>Copy all my comments</button>
+        <textarea class="copyout" id="copyout" readonly hidden aria-label="Your comments, to copy"></textarea>
+      </div>
+    </div>
+  </section>
+  <div class="toast" id="toast" role="status"></div>
+</div>
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var meta = function (n, d) { var m = document.querySelector('meta[name="' + n + '"]'); return m ? m.getAttribute('content') : d; };
+  var APP = meta('mockup-app', 'Your app');
+  var KIND = meta('mockup-kind', 'new');
+  var RESERVED = /^(settings|sidebar|customize|upgrade|downloads|comment-.*)$/;
+
+  // Read the screens: one <template data-screen> per version of a screen.
+  var screens = {}, order = [];
+  Array.prototype.forEach.call(document.querySelectorAll('template[data-screen]'), function (t) {
+    var id = t.getAttribute('data-screen');
+    if (!/^[a-z][a-z0-9-]*$/.test(id) || RESERVED.test(id)) { console.error('Mockup: bad screen id ' + id); return; }
+    var s = screens[id];
+    if (!s) {
+      s = screens[id] = { id: id, name: t.getAttribute('data-name') || id, about: t.getAttribute('data-about') || '', group: t.getAttribute('data-group') || 'Screens', variants: [], pick: 0 };
+      order.push(id);
+    }
+    if (t.getAttribute('data-about') && !s.about) s.about = t.getAttribute('data-about');
+    s.variants.push({ label: t.getAttribute('data-variant') || '', theme: t.getAttribute('data-theme') || '', t: t });
+    // Which version shows first: the one marked data-default, else the last (the "after") in a
+    // before-and-after mockup, else the first.
+    if (t.hasAttribute('data-default')) { s.pick = s.variants.length - 1; s.defaultSet = true; }
+    else if (KIND === 'before-after' && !s.defaultSet) s.pick = s.variants.length - 1;
+  });
+  var flow = (meta('mockup-flow', '') || '').split(/\s+/).filter(function (id) { return screens[id]; });
+  var cur = null, hist = [], notesOn = false;
+
+  document.title = meta('mockup-title', APP + ' mockup');
+  $('appname').textContent = document.title;
+
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function toast(t) { var x = $('toast'); x.textContent = t; x.classList.add('on'); clearTimeout(toast.h); toast.h = setTimeout(function () { x.classList.remove('on'); }, 2600); }
+  // A note's label: data-note-label if given, else the button's own words (its bold line, or its
+  // first line with words in it, not an icon alone), else its aria-label.
+  function noteLabel(n) {
+    var b = n.querySelector('b, strong, h1, h2, h3');
+    var t = n.getAttribute('data-note-label') || (b && b.textContent) || (n.innerText || '').split('\n').filter(function (x) { return /[A-Za-z0-9\u00C0-\uFFEF]/.test(x) && !/^[\s\u2190-\u2BFF\uFE0F\u200D\uD83C-\uDBFF\uDC00-\uDFFF]+$/.test(x); })[0] || n.getAttribute('aria-label') || '';
+    return t.replace(/\s+/g, ' ').trim().slice(0, 60) || 'This button';
+  }
+
+  function show(id, opts) {
+    opts = opts || {};
+    var s = screens[id] || screens[order[0]];
+    if (!s) { $('app').innerHTML = '<p class="empty">This mockup has no screens yet.</p>'; return; }
+    if (cur && cur !== s.id && !opts.back) hist.push(cur);
+    cur = s.id;
+    var v = s.variants[s.pick];
+    var app = $('app');
+    app.className = 'app' + (v.theme ? ' theme-' + v.theme : '');
+    app.innerHTML = '';
+    var wrap = el('div', 'screen');
+    wrap.setAttribute('data-screen-root', s.id);
+    wrap.appendChild(v.t.content.cloneNode(true));
+    app.appendChild(wrap);
+    app.scrollTop = 0;
+    // Header
+    $('scrname').textContent = s.name + (s.variants.length > 1 && v.label ? ' · ' + v.label : '');
+    // Where this screen is: the same number as in the list of screens, and nothing when there's only one
+    $('pos').textContent = order.length > 1 ? (order.indexOf(s.id) + 1) + ' of ' + order.length : '';
+    // Versions
+    var vb = $('variants'); vb.innerHTML = '';
+    vb.hidden = s.variants.length < 2;
+    s.variants.forEach(function (vv, i) {
+      var b = el('button', '', vv.label || 'Version ' + (i + 1));
+      b.type = 'button'; b.setAttribute('aria-pressed', String(i === s.pick));
+      b.addEventListener('click', function () { s.pick = i; show(s.id, { back: true, keepNotes: true }); });
+      vb.appendChild(b);
+    });
+    // Next
+    var nx = nextOf(s.id);
+    $('bNext').hidden = order.length < 2;
+    $('nextlabel').textContent = nx ? 'Next' : 'Start again';
+    $('nextic').innerHTML = nx ? '<path d="M9 5l7 7-7 7"/>' : '<path d="M5 12a7 7 0 1 0 2.1-5"/><path d="M5 4v4h4"/>';
+    // Notes for this screen
+    buildNotes();
+    // Comment sheet title
+    $('hComment').textContent = 'Comment on ' + s.name + (s.variants.length > 1 && v.label ? ' (' + v.label + ')' : '');
+    // List
+    Array.prototype.forEach.call(document.querySelectorAll('#screenlist .list-item'), function (b) { b.setAttribute('aria-current', String(b.getAttribute('data-id') === s.id)); });
+    if (location.hash.slice(1) !== s.id) { try { history.replaceState(null, '', '#' + s.id); } catch (e) { /* not allowed here */ } }
+  }
+  function nextOf(id) {
+    var fi = flow.indexOf(id);
+    if (fi >= 0 && fi < flow.length - 1) return flow[fi + 1];
+    var oi = order.indexOf(id);
+    return oi < order.length - 1 ? order[oi + 1] : null;
+  }
+
+  function buildNotes() {
+    var list = $('notelist'); list.innerHTML = ''; list.scrollTop = 0;
+    var noted = $('app').querySelectorAll('[data-note]');
+    $('ncount').textContent = noted.length ? '· ' + noted.length : '';
+    var old = $('notes').querySelector('.none'); if (old) old.remove();
+    if (!noted.length) { var p = el('p', 'none', 'Nothing to tap on this screen.'); $('notes').appendChild(p); }
+    Array.prototype.forEach.call(noted, function (n, i) {
+      n.setAttribute('data-pin', String(i + 1));
+      if (getComputedStyle(n).position === 'static') n.style.position = 'relative';
+      var li = el('li'), b = el('button'); b.type = 'button';
+      var pin = el('span', 'pin-n', String(i + 1)); pin.setAttribute('aria-hidden', 'true');
+      var tx = el('span'); tx.appendChild(el('b', '', noteLabel(n))); tx.appendChild(el('span', 'w', n.getAttribute('data-note')));
+      b.appendChild(pin); b.appendChild(tx);
+      b.addEventListener('click', function () { var app = $('app'), r = n.getBoundingClientRect(), ar = app.getBoundingClientRect(); app.scrollTop += r.top - ar.top - ar.height / 4; n.classList.add('flash'); setTimeout(function () { n.classList.remove('flash'); }, 1200); });
+      li.appendChild(b); list.appendChild(li);
+    });
+  }
+  function setNotes(on) {
+    notesOn = on;
+    document.body.classList.toggle('notes-on', on);
+    $('notes').classList.toggle('on', on);
+    $('notes').setAttribute('aria-hidden', String(!on));
+    $('bNotes').setAttribute('aria-pressed', String(on));
+  }
+
+  // Taps inside the app
+  $('app').addEventListener('click', function (e) {
+    var g = e.target.closest('[data-go]');
+    var a = e.target.closest('a, button, form');
+    if (a) e.preventDefault();
+    if (!g) {
+      if (a && a.hasAttribute('data-note') && !notesOn) toast(a.getAttribute('data-note'));
+      return;
+    }
+    var to = g.getAttribute('data-go');
+    if (to === 'back') { var p = hist.pop(); if (p) show(p, { back: true }); return; }
+    if (screens[to]) show(to);
+  });
+  $('app').addEventListener('submit', function (e) { e.preventDefault(); });
+
+  // Screens list
+  (function () {
+    var box = $('screenlist'), last = null, n = 0;
+    order.forEach(function (id) {
+      var s = screens[id];
+      if (s.group !== last) { box.appendChild(el('div', 'list-group', s.group)); last = s.group; }
+      var b = el('button', 'list-item'); b.type = 'button'; b.setAttribute('data-id', id);
+      b.appendChild(el('span', 'n', String(++n)));
+      var t = el('span'); t.appendChild(el('b', '', s.name));
+      var sub = s.about; if (s.variants.length > 1) sub = (sub ? sub + ' · ' : '') + s.variants.map(function (v) { return v.label; }).join(' / ');
+      if (sub) t.appendChild(el('small', '', sub));
+      b.appendChild(t);
+      b.addEventListener('click', function () { closeSheets(); show(id); });
+      box.appendChild(b);
+    });
+  })();
+
+  // Sheets
+  var opener = null;
+  function openSheet(id) {
+    closeSheets(true);
+    opener = document.activeElement;
+    $(id).classList.add('on'); $(id).setAttribute('aria-hidden', 'false'); $('scrim').classList.add('on');
+    var f = $(id).querySelector('textarea.cbox') || $(id).querySelector('[aria-current="true"]') || $(id).querySelector('.close');
+    setTimeout(function () { if (f && f.tagName !== 'TEXTAREA') f.focus(); }, 60);
+  }
+  function closeSheets(quiet) {
+    Array.prototype.forEach.call(document.querySelectorAll('.sheet.on'), function (s) { s.classList.remove('on'); s.setAttribute('aria-hidden', 'true'); });
+    $('scrim').classList.remove('on');
+    if (!quiet && opener && opener.focus) opener.focus();
+  }
+  $('scrim').addEventListener('click', function () { closeSheets(); });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-close]'), function (b) { b.addEventListener('click', function () { closeSheets(); }); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeSheets(); if (notesOn) setNotes(false); } });
+  $('bScreens').addEventListener('click', function () { openSheet('sheetScreens'); });
+  $('bNotes').addEventListener('click', function () { setNotes(!notesOn); });
+  $('notesHide').addEventListener('click', function () { setNotes(false); });
+  $('bNext').addEventListener('click', function () { show(nextOf(cur) || flow[0] || order[0]); });
+  $('bComment').addEventListener('click', function () { $('cmsg').textContent = ''; $('cmsg').className = 'msg'; refreshMine(); refreshSend(); openSheet('sheetComment'); });
+
+  // ---------- Comments ----------
+  // Every comment is kept on this phone (so it can be copied into the chat), and, when the page is
+  // published as a Claude artifact page with the comments capability, also in the page's own
+  // comments, sent to Claude when this viewer can do that.
+  var KEY = 'lw-mockup:' + APP + ':comments';
+  var mem = [];
+  function loadMine() { try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch (e) { return mem; } }
+  function saveMine(list) { mem = list; try { localStorage.setItem(KEY, JSON.stringify(list)); } catch (e) { /* this viewer keeps nothing */ } }
+  var C = null, canSend = 'off', posting = 'local';
+  function refreshSend() {
+    var b = $('cSend');
+    b.textContent = posting === 'claude' ? 'Send to Claude' : posting === 'page' ? 'Post comment' : 'Save comment';
+  }
+  function refreshMine() {
+    var list = loadMine();
+    var one = list.length === 1;
+    $('minecount').textContent = list.length ? 'You have ' + (one ? '1 comment' : list.length + ' comments') + ' on this phone.' + (posting === 'claude' ? ' Claude already has the ones you sent.' : one ? ' Copy it and paste it in the chat with Claude.' : ' Copy them and paste them in the chat with Claude.') : 'No comments on this phone yet.';
+    $('cCopy').hidden = !list.length; $('copyout').hidden = true;
+  }
+  function allText() {
+    return document.title + ', my comments:\n' + loadMine().map(function (c) { return '• ' + c.name + (c.variant ? ' (' + c.variant + ')' : '') + ': ' + c.text; }).join('\n');
+  }
+  (function () {
+    try {
+      if (!window.claude || typeof window.claude.use !== 'function') return;
+      window.claude.use('comments').then(function (ns) {
+        if (!ns) return;
+        C = ns; posting = 'page';
+        if (typeof ns.canSendToClaude === 'function') {
+          ns.canSendToClaude().then(function (v) { canSend = v; if (v === 'available') posting = 'claude'; refreshSend(); refreshMine(); }, function () {});
+        }
+        refreshSend();
+      }, function () {});
+    } catch (e) { /* not on an artifact page */ }
+  })();
+  $('cSend').addEventListener('click', function () {
+    var box = $('cbox'), text = box.value.trim(), msg = $('cmsg');
+    if (!text) { msg.className = 'msg bad'; msg.textContent = 'Write or say something first.'; box.focus(); return; }
+    var s = screens[cur], v = s.variants[s.pick];
+    var entry = { screen: s.id, name: s.name, variant: s.variants.length > 1 ? v.label : '', text: text, at: new Date().toISOString() };
+    var list = loadMine(); list.push(entry); saveMine(list);
+    var where = s.name + (entry.variant ? ' (' + entry.variant + ')' : '');
+    if (!C) {
+      box.value = ''; msg.className = 'msg ok'; msg.textContent = 'Saved on this phone.'; refreshMine(); return;
+    }
+    var b = $('cSend'); b.disabled = true; msg.className = 'msg'; msg.textContent = 'Sending…';
+    var root = $('app').querySelector('[data-screen-root]');
+    var full = where + ': ' + text;
+    C.anchorFor(root).then(function (anchor) {
+      return posting === 'claude' ? C.sendToClaude({ anchor: anchor, text: full }) : C.create({ anchor: anchor, text: full });
+    }).then(function () {
+      box.value = ''; msg.className = 'msg ok';
+      msg.textContent = posting === 'claude' ? 'Sent to Claude. The answer comes in the comments, and the page updates.' : 'Posted on the page. Claude reads it when you say you\'ve left comments.';
+      refreshMine();
+    }, function (err) {
+      var code = err && err.code;
+      msg.className = 'msg bad';
+      if (code === 'consent_required') msg.textContent = 'Not posted: the page needs your OK to comment as you. It\'s saved on this phone, so you can copy it into the chat instead.';
+      else if (code === 'claude_unavailable') { posting = 'page'; refreshSend(); msg.textContent = 'Claude can\'t take it from here right now. Tap Post comment, or copy your comments into the chat.'; }
+      else if (code === 'forbidden' || code === 'not_granted' || code === 'unavailable') { C = null; posting = 'local'; refreshSend(); msg.textContent = 'Commenting from the page is off here. It\'s saved on this phone: copy your comments into the chat.'; }
+      else msg.textContent = 'That didn\'t go through. It\'s saved on this phone, so nothing is lost: copy your comments into the chat.';
+      refreshMine();
+    }).then(function () { b.disabled = false; });
+  });
+  $('cCopy').addEventListener('click', function () {
+    var t = allText(), out = $('copyout');
+    var done = function () { toast('Copied. Paste it in the chat with Claude.'); };
+    var fallback = function () { out.hidden = false; out.value = t; out.focus(); out.select(); toast('Select all and copy, then paste it in the chat.'); };
+    try { navigator.clipboard.writeText(t).then(done, fallback); } catch (e) { fallback(); }
+  });
+
+  // Start: the screen named after the #, or the first screen of the main flow
+  window.addEventListener('hashchange', function () { var h = location.hash.slice(1); if (screens[h] && h !== cur) show(h); });
+  var start = location.hash.slice(1);
+  show(screens[start] ? start : (flow[0] || order[0]));
+  refreshSend();
+  // For checks: what the page holds
+  window.LW_MOCKUP = { app: APP, kind: KIND, flow: flow.slice(), screens: order.map(function (id) { var s = screens[id]; return { id: id, name: s.name, group: s.group, variants: s.variants.map(function (v) { return v.label; }) }; }), show: function (id, vi) { if (vi != null && screens[id]) screens[id].pick = vi; show(id, { back: true }); }, current: function () { return cur; } };
+})();
+</script>
+</body>
+</html>

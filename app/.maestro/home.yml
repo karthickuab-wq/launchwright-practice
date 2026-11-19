@@ -1,0 +1,5 @@
+appId: com.example.starterapp # The check keeps this equal to app.json's package and bundle identifier.
+---
+- launchApp
+- assertVisible: 'Starter App'
+- assertVisible: 'Your app starts here.'

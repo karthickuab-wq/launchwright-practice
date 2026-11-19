@@ -1,0 +1,99 @@
+<!--
+  Example screens file for an app the user already has (spec screen E6): a dog groomer's booking
+  app, each changed screen shown as it is now and as it will be. Build it with
+    node skills/mockup/make-page.mjs skills/mockup/examples/before-after/screens.html <page to write>
+-->
+<meta name="mockup-app" content="Tidy Tails">
+<meta name="mockup-title" content="Tidy Tails: before and after">
+<meta name="mockup-kind" content="before-after">
+<meta name="mockup-flow" content="book confirm">
+<style>
+.app {
+  --bg: #FFFFFF; --surface: #F3F6F5; --ink: #17302B; --muted: #5E716C; --line: #DDE3E1;
+  --accent: #1F7A6B; --accent-ink: #FFFFFF; --accent-soft: #E1F1EE; --radius: 16px; --title: 27px;
+}
+/* "Now": the app as it is today, kept close to its real look */
+.app.theme-now { --bg: #FFFFFF; --surface: #F4F4F4; --ink: #222222; --muted: #777777; --line: #BDBDBD; --accent: #3B5BA9; --accent-soft: #E8E8E8; --radius: 3px; --title: 22px; --font: Arial, Helvetica, sans-serif; }
+.tt-old-label { font-size: 13px; color: #444; margin: 12px 0 4px; font-weight: 700; }
+.tt-old-input { height: 38px; border: 1px solid #BDBDBD; border-radius: 3px; background: #fff; padding: 9px 8px; font-size: 14px; color: #999; }
+.tt-old-btn { margin-top: 18px; width: 100%; min-height: 44px; border: 0; background: #3B5BA9; color: #fff; font: 700 14px Arial, sans-serif; letter-spacing: .06em; border-radius: 3px; }
+.tt-days { display: flex; gap: 8px; overflow-x: auto; margin: 4px -20px 14px; padding: 0 20px 4px; }
+.tt-day { flex: none; width: 58px; min-height: 66px; border-radius: 14px; border: 1px solid var(--line); background: var(--bg); font: inherit; color: var(--ink); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.tt-day small { font-size: 12px; color: var(--muted); } .tt-day b { font-size: 19px; }
+.tt-day[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; } .tt-day[aria-pressed="true"] small { color: #D5EEE9; }
+.tt-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.tt-slot { min-height: 46px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); font: inherit; font-weight: 650; color: var(--ink); }
+.tt-slot[aria-pressed="true"] { border: 2px solid var(--accent); background: var(--accent-soft); color: var(--accent); }
+.tt-slot[disabled] { color: #B4BFBC; text-decoration: line-through; }
+.tt-dog { display: flex; gap: 10px; }
+.tt-dog .a-row { flex: 1; margin: 0; }
+.tt-sum { background: var(--surface); border-radius: var(--radius); padding: 14px; margin-top: 14px; }
+.tt-sum div { display: flex; justify-content: space-between; padding: 5px 0; } .tt-sum span { color: var(--muted); }
+</style>
+
+<template data-screen="book" data-name="Book a groom" data-group="Booking" data-about="Pick a time, in fewer taps" data-variant="Now" data-theme="now">
+  <div class="a-pad">
+    <h1 class="a-title">Book a groom</h1>
+    <p class="a-sub">Please fill in all fields.</p>
+    <div class="tt-old-label">Date</div><div class="tt-old-input">dd/mm/yyyy</div>
+    <div class="tt-old-label">Time</div><div class="tt-old-input">hh:mm</div>
+    <div class="tt-old-label">Dog's name</div><div class="tt-old-input">&nbsp;</div>
+    <div class="tt-old-label">Phone</div><div class="tt-old-input">&nbsp;</div>
+    <button class="tt-old-btn" data-go="confirm" data-note="Sends the form. Today it can ask for a time that's already taken, and the groomer phones back.">SUBMIT</button>
+  </div>
+</template>
+<template data-screen="book" data-variant="After">
+  <div class="a-pad">
+    <h1 class="a-title">When suits you?</h1>
+    <p class="a-sub">Taken times can't be picked.</p>
+    <div class="tt-days" data-scroll-x>
+      <button class="tt-day" data-note="Shows Wednesday's free times."><small>Wed</small><b>18</b></button>
+      <button class="tt-day" aria-pressed="true" data-note="Shows Thursday's free times. Picked."><small>Thu</small><b>19</b></button>
+      <button class="tt-day" data-note="Shows Friday's free times."><small>Fri</small><b>20</b></button>
+      <button class="tt-day" data-note="Shows Saturday's free times."><small>Sat</small><b>21</b></button>
+      <button class="tt-day" data-note="Shows Monday's free times."><small>Mon</small><b>23</b></button>
+      <button class="tt-day" data-note="Shows Tuesday's free times."><small>Tue</small><b>24</b></button>
+      <button class="tt-day" data-note="Shows Wednesday's free times."><small>Wed</small><b>25</b></button>
+    </div>
+    <div class="tt-slots">
+      <button class="tt-slot" data-note="Picks 9:00.">9:00</button>
+      <button class="tt-slot" aria-pressed="true" data-note="Picks 10:30. Picked.">10:30</button>
+      <button class="tt-slot" disabled data-note="Taken, so it can't be picked.">11:45</button>
+      <button class="tt-slot" data-note="Picks 13:00.">13:00</button>
+      <button class="tt-slot" data-note="Picks 14:15.">14:15</button>
+      <button class="tt-slot" data-note="Picks 15:30.">15:30</button>
+    </div>
+    <h2 class="a-h2">Who's coming?</h2>
+    <div class="tt-dog">
+      <button class="a-row" data-note="Books for Biscuit, remembered from last time."><span class="a-ic">🐶</span><span class="m"><b>Biscuit</b><small>Full groom</small></span></button>
+      <button class="a-row" data-note="Adds another dog."><span class="a-ic">＋</span><span class="m"><b>Another</b><small>Add a dog</small></span></button>
+    </div>
+    <button class="a-btn" data-go="confirm" data-note="Books Thursday 10:30 for Biscuit straight away. No phone call needed.">Book Thu 19, 10:30</button>
+  </div>
+</template>
+
+<template data-screen="confirm" data-name="Booked" data-group="Booking" data-about="What you see after booking" data-variant="Now" data-theme="now">
+  <div class="a-pad">
+    <h1 class="a-title">Thank you</h1>
+    <p class="a-sub">Your request has been received. We will call you to confirm your appointment.</p>
+    <button class="tt-old-btn" data-go="book" data-note="Goes back to the form.">BACK</button>
+  </div>
+</template>
+<template data-screen="confirm" data-variant="After">
+  <div class="a-pad">
+    <p class="a-eyebrow">You're booked</p>
+    <h1 class="a-title">Thursday 19 November, 10:30</h1>
+    <div class="tt-sum"><div><span>Dog</span><b>Biscuit</b></div><div><span>Groom</span><b>Full groom, about 2 hours</b></div><div><span>Where</span><b>12 Mill Lane</b></div></div>
+    <div class="a-notif"><span class="ap"></span><div><b>Wednesday, 6 pm</b><p>We'll remind you the evening before.</p></div></div>
+    <button class="a-btn" data-go="book" data-note="Opens the booking again, to pick another time. Free up to a day before.">Change the time</button>
+    <button class="a-btn ghost" style="margin-top:8px" data-note="Adds the booking to the phone's calendar.">Add to my calendar</button>
+  </div>
+</template>
+
+<template data-screen="dogs" data-name="My dogs" data-group="Not changing" data-about="Stays as it is">
+  <div class="a-pad">
+    <h1 class="a-title">My dogs</h1>
+    <p class="a-sub">This screen isn't changing. It's here so you can see the whole booking path.</p>
+    <button class="a-row" data-go="book" data-note="Books a groom for Biscuit."><span class="a-ic">🐶</span><span class="m"><b>Biscuit</b><small>Cockapoo · last groomed 12 October</small></span></button>
+  </div>
+</template>

@@ -1,0 +1,7 @@
+appId: com.example.starterapp
+---
+- launchApp
+- tapOn: 'More'
+- assertVisible: 'Nothing tapped yet.'
+- tapOn: 'Tap here'
+- assertVisible: 'Tap received.'

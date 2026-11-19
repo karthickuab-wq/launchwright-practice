@@ -1,0 +1,34 @@
+# Sends the app to Google Play's internal testing track, only after the user taps Approve on this run's
+# page on expo.dev (spec screens 16 and 17, open point O5). The kit copies this file to .eas/workflows/
+# in the project; that folder is protected from agents, so only a kit update or setup writes it.
+# A push whose message says [store-android] starts it: Claude can push that, and it builds the store
+# version. Nothing goes to Google until someone signed in to the user's Expo account approves the
+# waiting job; the project's Claude has no Expo sign-in, so that tap is always the user's. Reject, or
+# 30 days with no answer, and nothing is sent.
+# It only ever uploads to internal testing (eas.json's submit profile). Moving a version to the closed
+# test for Google's testers, or to production, is the user's own step in Play Console.
+# Before the first run: the app's entry in Play Console, and Google's service account key on Expo (the
+# launch-prep skill walks through both).
+name: send-to-stores-android
+on:
+  push:
+    branches: ['main']
+    if: ${{ contains(github.commit_message, '[store-android]') }}
+jobs:
+  build_android:
+    name: Build the Google Play version
+    type: build
+    params:
+      platform: android
+      profile: production
+  approve:
+    name: Send this version to Google Play?
+    needs: [build_android]
+    type: require-approval
+  send_android:
+    name: Upload to Google Play (internal testing)
+    needs: [build_android, approve]
+    type: submit
+    params:
+      build_id: ${{ needs.build_android.outputs.build_id }}
+      profile: production

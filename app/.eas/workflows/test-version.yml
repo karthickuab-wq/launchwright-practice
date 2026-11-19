@@ -1,0 +1,21 @@
+# The test version the user installs on their phone at a checkpoint (spec screen 15), built on Expo's servers.
+# The kit copies this file to .eas/workflows/ in the project; that folder is protected from agents, so only a kit
+# update or setup writes it. It runs only for a push whose message says [checkpoint], so a normal push never uses
+# up the free plan's builds (one per platform each checkpoint). It builds the preview profile from eas.json:
+# internal distribution, installed from a link. It never submits to a store and never deploys.
+name: test-version
+on:
+  push:
+    branches: ['main']
+    if: ${{ contains(github.commit_message, '[checkpoint]') }}
+jobs:
+  build_ios:
+    type: build
+    params:
+      platform: ios
+      profile: preview
+  build_android:
+    type: build
+    params:
+      platform: android
+      profile: preview
