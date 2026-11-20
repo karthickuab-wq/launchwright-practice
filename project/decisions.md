@@ -15,5 +15,5 @@ Recorded by the first home-project thread ("set up my home project"), 2026-11-20
 
 - Step 8 · The home project: started 2026-11-20. The kit's settings now say type home, no app folder, name Karthick. The app folder the starter brought stays unused.
 - Time zone: Eastern (America/New_York), confirmed by Karthick 2026-11-20.
-- Step 6 · Phone alerts: no alert channel is set in this project's environment yet, so the test alert couldn't be sent (2026-11-20). Waiting on Karthick: set up alerts, or skip them.
+- Step 6 · Phone alerts: in progress 2026-11-20. No alert went out yet because the environment had no alert channel; Karthick is adding it and installing ntfy.
 - Steps 1 to 5, 7 and 9: not confirmed yet; recorded here as Karthick confirms each one.
