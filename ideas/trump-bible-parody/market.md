@@ -43,3 +43,5 @@ Weak demand, and the book idea has been done at least four times since 2017 with
 | Google Play listings (8 apps) | play.google.com/store/apps/details?id=... | Nov 20, 2026 | Two (com.FoundationTen.TrumpStumpQuiz, com.mplgmg.Trump_Quotes) showed no details; com.CutlassAppDev.trumpquotes: 10+, $9.99 - $394.99 per item |
 | AutBaut developer page | https://play.google.com/store/apps/developer?id=AutBaut | Nov 20, 2026 | |
 | IBTimes, Barnes & Noble, Blackwell's, Goodreads | | not read | Sites not reachable from the cloud (should be added to the setup's list of allowed sites) |
+
+Parked by the user on Nov 22, 2026, to try a different idea.
