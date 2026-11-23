@@ -18,7 +18,10 @@ Busy but beatable. One big, pricey leader that is aimed at teams; the small riva
 | OpusActa | Photo reports as PDF | not read | no rating yet | 1+ | Brand new |
 | JobShot, JobPhotoLog, SiteCam | Before/after reports (iPhone) | App Store only, not read | App Store only, not read | n/a | Seen in search results only |
 
-## Verdict
+## Correction, Nov 23, 2026
+The verdict below was wrong about supply. A second review the user shared, checked on the makers' own websites through the built-in browser on Nov 23, 2026, found the simple solo product already exists several times over: [JobPics](https://www.jobpics.app/) ("The photo app for solo service pros", iOS and Android), [Logged](https://getlogged.app/) ($9.99 per month or $89.99 per year, solo contractors, before/after photos on invoices), [SiteCam](https://sitecam.io/pricing/) (free: 500 photos, 25 reports, 3 projects; Pro $29 per user per month), [Jobshot](https://jobshot.site/) ($29 per month per company). [CompanyCam](https://companycam.com/pricing)'s Core plan is now "For Solo & Small Teams": $63 per month billed annually, 1 user included. The review also names iPhone apps (JobFrame, ProofPix, JobProof, NeatReport) with few or no ratings; their App Store pages aren't read here. New verdict: crowded with small look-alikes that few people pay for. Not recommended to build as planned. See the project's lessons.
+
+## Original verdict (superseded)
 Real demand with paying users, and a leader that is expensive and complex for one-person businesses. Win by being the simple, cheap before-and-after report app for solo tradespeople (cleaners, painters, handymen).
 
 ## Suggested tweaks
